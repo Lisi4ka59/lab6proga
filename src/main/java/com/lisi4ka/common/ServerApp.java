@@ -57,7 +57,7 @@ public class ServerApp {
                     sc.read(bb);
                     String result = new String(bb.array()).trim();
                     System.out.println(result);
-                    //queue.add("command receive");
+                    /*queue.add("command receive");*/
 
                     if (result.length() <= 0) {
                         sc.close();
