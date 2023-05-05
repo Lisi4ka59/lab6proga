@@ -1,6 +1,5 @@
 package com.lisi4ka.common;
 
-import com.lisi4ka.commands.HelpCommand;
 import com.lisi4ka.utils.CityLinkedList;
 import com.lisi4ka.utils.PackagedCommand;
 import com.lisi4ka.utils.PackagedResponse;

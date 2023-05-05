@@ -1,6 +1,8 @@
 package com.lisi4ka.utils;
 
-public class PackagedResponse {
+import java.io.Serializable;
+
+public class PackagedResponse implements Serializable {
     private String message;
     public PackagedResponse(String message, ResponseStatus status){
         this.message = message;
