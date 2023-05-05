@@ -19,7 +19,6 @@ public class LoadCommand implements Command {
         this.collection = collection;
     }
     private String load(String fileName) {
-
         try {
             String path = System.getenv("CITIES_PATH");
             if (path!=null && "cities.json".equals(fileName))
@@ -28,14 +27,13 @@ public class LoadCommand implements Command {
             JsonObject jsonObject = (JsonObject) Jsoner.deserialize(reader);
             JsonArray jsonArray = (JsonArray)jsonObject.get("cities");
             Invoker invoker = new Invoker(collection);
-            invoker.run("clear");
+            filepath = fileName;
             for (Object obj: jsonArray) {
                 JsonObject jo = (JsonObject) obj;
                 City city = new City(jo);
                 collection.add(city);
             }
             collection.sort(new CityComparator());
-            filepath = fileName;
             return "Collection uploaded";
         } catch (JsonException | IllegalArgumentException | NullPointerException e) {
             return "Can not upload collection, data in the file incorrect! " + e.getMessage()  + "\n";
@@ -46,7 +44,7 @@ public class LoadCommand implements Command {
         }
     }
     @Override
-    public String execute(String fileName){
-        return load(fileName);
+    public String execute(){
+        return load("cities.json");
     }
 }

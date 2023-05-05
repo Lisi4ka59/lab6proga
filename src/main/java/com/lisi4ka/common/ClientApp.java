@@ -78,10 +78,8 @@ public class ClientApp {
             if (msg.equalsIgnoreCase("quit")) {
                 return true;
             }
-
-            if (msg.equalsIgnoreCase("help")) {
-                PackagedCommand packagedCommand = new PackagedCommand();
-                packagedCommand.setCommandName("help");
+            else if(msg.equalsIgnoreCase("show")){
+                PackagedCommand packagedCommand = new PackagedCommand(msg,null, null);
                 ByteArrayOutputStream str = new ByteArrayOutputStream();
                 ObjectOutputStream obj = new ObjectOutputStream(str);
                 obj.writeObject(packagedCommand);

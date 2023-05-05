@@ -15,6 +15,6 @@ public class ClearCommand implements Command{
     @Override
     public String execute() {
         collection.clear();
-        return "Collection cleaned!" + defaultSave(collection);
+        return "Collection cleaned!\n" + defaultSave(collection);
     }
 }

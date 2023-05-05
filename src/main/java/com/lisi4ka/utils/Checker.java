@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Scanner;
 
-import static com.sun.org.apache.xerces.internal.util.XMLChar.trim;
+//import static com.sun.org.apache.xerces.internal.util.XMLChar.trim;
 
 
 public class Checker {
@@ -16,7 +16,7 @@ public class Checker {
         System.out.print(prompt);
         String message = "The entered value is not integer, enter correct value\nRepeat input: ";
         do {
-            testString = trim(scanner.nextLine());
+            testString = scanner.nextLine().trim();
             try {
                 value = Integer.parseInt(testString);
                 return value;
@@ -32,7 +32,7 @@ public class Checker {
         System.out.print(prompt);
         String message = "The entered value is not long, enter correct value\nRepeat input: ";
         do {
-            testString = trim(scanner.nextLine());
+            testString = (scanner.nextLine()).trim();
             try {
                 value = Long.parseLong(testString);
                 return value;
@@ -48,7 +48,7 @@ public class Checker {
         System.out.print(prompt);
         String message = "The entered value is not float, enter correct value\nRepeat input: ";
         do {
-            testString = trim(scanner.nextLine());
+            testString =scanner.nextLine().trim();
             try {
                 value = Float.parseFloat(testString);
                 return value;
@@ -64,7 +64,7 @@ public class Checker {
         System.out.print(prompt);
         String message = "The entered value is not double, enter correct value\nRepeat input: ";
         do {
-            testString = trim(scanner.nextLine());
+            testString = (scanner.nextLine()).trim();
             try {
                 value = Double.parseDouble(testString);
                 return value;
@@ -80,7 +80,7 @@ public class Checker {
         String dateTest;
         System.out.print(prompt);
         do {
-            date = trim(scanner.nextLine());
+            date = (scanner.nextLine()).trim();
             dateTest = date.replace(".", "");
             String[] dateArray = date.split("\\.");
             boolean isNumeric;
@@ -106,7 +106,7 @@ public class Checker {
     }
 
     public static Date checkDate(String Date) {
-        Date = trim(Date);
+        Date = (Date).trim();
         Date = Date.replace(" ", ".");
         String[] DateArray = Date.split("\\.");
         try {
@@ -119,7 +119,7 @@ public class Checker {
         }
     }
     public static LocalDateTime checkLocalDateTime(String localDate) {
-            localDate = trim(localDate);
+            localDate = (localDate).trim();
             localDate = localDate.replace(":", ".");
             localDate = localDate.replace(" ", ".");
             String[] localDateArray = localDate.split("\\.");
@@ -141,7 +141,7 @@ public class Checker {
         String string;
         System.out.print(prompt);
         do {
-            string = trim(scanner.nextLine());
+            string = (scanner.nextLine()).trim();
             if (string.isEmpty()) {
                 System.out.print(message);
                 }
@@ -153,7 +153,7 @@ public class Checker {
     public static String inputString(String prompt){
         Scanner scanner = new Scanner(System.in);
         System.out.print(prompt);
-        return trim(scanner.nextLine());
+        return (scanner.nextLine()).trim();
     }
     public static int inputEnumNumber(String prompt, int maxValue, Boolean isNull){
         Scanner scanner = new Scanner(System.in);
@@ -162,7 +162,7 @@ public class Checker {
         System.out.print(prompt);
         String message = "The entered value is not correct, enter correct value\nRepeat input: ";
         do {
-            testString = trim(scanner.nextLine());
+            testString = (scanner.nextLine()).trim();
             if ("".equals(testString) && isNull){
                 return 0;
             }

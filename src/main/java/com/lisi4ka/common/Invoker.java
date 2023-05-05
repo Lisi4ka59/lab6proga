@@ -1,6 +1,8 @@
 package com.lisi4ka.common;
 
 import com.lisi4ka.commands.*;
+import com.lisi4ka.utils.PackagedCommand;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +28,12 @@ public class Invoker {
         commands.put("add_if_min", new AddIfMinCommand(collection));
         commands.put("execute_script", new ExecuteScriptCommand(collection));
     }
-
+    public String run(PackagedCommand packagedCommand) {
+        if (packagedCommand != null){
+            return run(packagedCommand.getCommandName() + " " + packagedCommand.getCommandArguments());
+        }
+        throw new IllegalArgumentException("Incorrect command format");
+    }
     public String run(String commandText) {
         try {
             String[] command =  commandText.split("\s+");

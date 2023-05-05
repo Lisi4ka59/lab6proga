@@ -17,7 +17,7 @@ public class DefaultSave {
             json = Jsoner.prettyPrint(json);
             writer.write(json);
             writer.close();
-            return null;
+            return "Changes saved";
         } catch (SecurityException e) {
             return String.format("Do not have sufficient rights to write file %s!\n", LoadCommand.filepath);
         } catch (Exception ex) {

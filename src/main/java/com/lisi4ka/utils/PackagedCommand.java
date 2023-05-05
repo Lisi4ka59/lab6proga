@@ -6,6 +6,11 @@ public class PackagedCommand implements Serializable{
         private String commandName;
         private String commandArguments;
         private String commandMisc;
+        public PackagedCommand(String name, String args, String misc){
+            commandName = name;
+            commandArguments = args;
+            commandMisc = misc;
+        }
         public void setCommandName(String name){
             commandName = name;
         }

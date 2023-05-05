@@ -3,6 +3,8 @@ package com.lisi4ka.common;
 import com.lisi4ka.commands.HelpCommand;
 import com.lisi4ka.utils.CityLinkedList;
 import com.lisi4ka.utils.PackagedCommand;
+import com.lisi4ka.utils.PackagedResponse;
+import com.lisi4ka.utils.ResponseStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,6 +23,8 @@ public class ServerApp {
     public static CityLinkedList cities = new CityLinkedList();
     public static void main(String[] args)
             throws Exception {
+        Invoker invoker = new Invoker(cities);
+        invoker.run("load");
         InetAddress host = InetAddress.getByName("localhost");
         Selector selector = Selector.open();
         ServerSocketChannel serverSocketChannel =
@@ -71,11 +75,8 @@ public class ServerApp {
                             PackagedCommand packagedCommand = (PackagedCommand) ois.readObject();
                             ois.close();
                             System.out.println(packagedCommand.getCommandName());
-                            if ("help".equals(packagedCommand.getCommandName())) {
-                                Invoker invoker = new Invoker(cities);
                                 String answer = invoker.run(packagedCommand.getCommandName());
                                 queue.add(answer);
-                            }
                         }
                         else {
                             queue.add("invalid message");
@@ -88,9 +89,8 @@ public class ServerApp {
                     SocketChannel sc = (SocketChannel) key.channel();
                     ByteArrayOutputStream str = new ByteArrayOutputStream();
                     ObjectOutputStream obj = new ObjectOutputStream(str);
-                    PackagedCommand packagedCommand = new PackagedCommand();
-                    packagedCommand.setCommandMisc(answer);
-                    obj.writeObject(packagedCommand);
+                    PackagedResponse packagedResponse = new PackagedResponse(answer, ResponseStatus.OK);
+                    obj.writeObject(packagedResponse);
                     String serCommand1 = Base64.getEncoder().encodeToString(str.toByteArray());
                     ByteBuffer bb = ByteBuffer.wrap(answer.getBytes());
                     sc.write(bb);
