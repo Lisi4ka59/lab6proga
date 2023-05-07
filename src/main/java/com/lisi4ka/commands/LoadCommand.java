@@ -1,7 +1,6 @@
 package com.lisi4ka.commands;
 
 import com.github.cliftonlabs.json_simple.*;
-import com.lisi4ka.common.Invoker;
 import com.lisi4ka.models.City;
 import com.lisi4ka.utils.CityComparator;
 import java.io.IOException;
@@ -18,16 +17,13 @@ public class LoadCommand implements Command {
 
         this.collection = collection;
     }
-    private String load(String fileName) {
+    private String load() {
+        String path = System.getenv("CITIES_PATH");
         try {
-            String path = System.getenv("CITIES_PATH");
-            if (path!=null && "cities.json".equals(fileName))
-                fileName = path;
-            Reader reader = Files.newBufferedReader(Paths.get(fileName));
+            Reader reader = Files.newBufferedReader(Paths.get(path));
             JsonObject jsonObject = (JsonObject) Jsoner.deserialize(reader);
             JsonArray jsonArray = (JsonArray)jsonObject.get("cities");
-            Invoker invoker = new Invoker(collection);
-            filepath = fileName;
+            filepath = path;
             for (Object obj: jsonArray) {
                 JsonObject jo = (JsonObject) obj;
                 City city = new City(jo);
@@ -38,13 +34,13 @@ public class LoadCommand implements Command {
         } catch (JsonException | IllegalArgumentException | NullPointerException e) {
             return "Can not upload collection, data in the file incorrect! " + e.getMessage()  + "\n";
         } catch (SecurityException e) {
-            return "Do not have sufficient rights to read file %s\n" + fileName + "\n";
+            return "Do not have sufficient rights to read file %s\n" + path + "\n";
         } catch (IOException e) {
-            return "Can not upload collection, the file " + fileName + " does not exist!\n";
+            return "Can not upload collection, the file " + path + " does not exist!\n";
         }
     }
     @Override
     public String execute(){
-        return load("cities.json");
+        return load();
     }
 }

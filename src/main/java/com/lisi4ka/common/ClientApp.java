@@ -3,6 +3,7 @@ package com.lisi4ka.common;
 import com.lisi4ka.utils.PackagedCommand;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -11,32 +12,48 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
-public class ClientApp {
-    private static BufferedReader input = null;
-    static int i = 100001;
-    public static void main(String[] args) throws Exception {
-        InetSocketAddress addr = new InetSocketAddress(
-                InetAddress.getByName("localhost"), 1234);
-        Selector selector = Selector.open();
-        SocketChannel sc = SocketChannel.open();
-        sc.configureBlocking(false);
-        sc.connect(addr);
-        sc.register(selector, SelectionKey.OP_CONNECT |
-                SelectionKey.OP_READ | SelectionKey.
-                OP_WRITE);
-        input = new BufferedReader(new InputStreamReader(System.in));
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.sleep;
 
+
+public class ClientApp {
+    static long timeOut = currentTimeMillis();
+    static boolean serverWork = true;
+    public static void main(String[] args) throws Exception {
         while (true) {
-            if (selector.select() > 0) {
-                Boolean doneStatus = processReadySet
-                        (selector.selectedKeys());
-                if (doneStatus) {
-                    break;
+            System.out.println("samuy pervuy while");
+            boolean doneStatus = true;
+            serverWork = true;
+            InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("localhost"), 1234);
+            Selector selector = Selector.open();
+            SocketChannel sc = SocketChannel.open();
+            sc.configureBlocking(false);
+            sc.connect(addr);
+            sc.register(selector, SelectionKey.OP_CONNECT |
+                    SelectionKey.OP_READ | SelectionKey.
+                    OP_WRITE);
+            while (true) {
+                if (selector.select() > 0) {
+                    try {
+                        doneStatus = processReadySet(selector.selectedKeys());
+                    }
+                    catch (ConnectException ex){
+                        System.out.println("Lost server connection. Repeat connecting in 10 seconds");
+
+                        break;
+                    }
+                    if (doneStatus || !serverWork) {
+                        break;
+                    }
                 }
             }
-
+            if (doneStatus) {
+                break;
+            }
+            sc.close();
+            sleep(10000);
+            timeOut = currentTimeMillis();
         }
-        sc.close();
     }
 
     public static Boolean processReadySet(Set readySet)
@@ -49,54 +66,55 @@ public class ClientApp {
             key = (SelectionKey) iterator.next();
             iterator.remove();
         }
+        assert key != null;
         if (key.isConnectable()) {
-            Boolean connected = processConnect(key);
+            Boolean connected = false;
+            try{
+                connected = processConnect(key);
+            }catch (Exception e){
+                System.out.println("Lost server connection. Repeat connecting in 15 seconds");
+            }
+
             if (!connected) {
-                return true;
+                return false;
             }
         }
         if (key.isReadable()) {
-            i++;
             SocketChannel sc = (SocketChannel) key.channel();
             ByteBuffer bb = ByteBuffer.allocate(1000000);
-            sc.read(bb);
-            String result = new String(bb.array()).trim();
-            if (result.length() > 0){
-                i= 100001;
+            try{
+                sc.read(bb);
+            }catch (Exception e){
+                System.out.println("sc read oshibka" + e);
+                serverWork = false;
+                return false;
             }
+
+            String result = new String(bb.array()).trim();
             System.out.println("Message received from Server: " + result + " Message length= "
                     + result.length());
         }
-        if (key.isWritable() && i > 100000) {
-            i = 0;
-            System.out.println("Type a message (type quit to stop): ");
-            Scanner scanner = new Scanner(System.in);
-            String msg;
-            try {
-                System.out.print("> ");
-                    msg = scanner.nextLine();
-            if (msg.equalsIgnoreCase("quit")) {
-                return true;
+        if (key.isWritable() && timeOut < (currentTimeMillis()-500)) {
+            for (PackagedCommand packagedCommand:  ClientValidation.validation()) {
+
+
+                if ("exit".equalsIgnoreCase(packagedCommand.getCommandName())) {
+                    return true;
+                }
+                ByteArrayOutputStream stringOut = new ByteArrayOutputStream();
+                ObjectOutputStream serializeObject = new ObjectOutputStream(stringOut);
+                serializeObject.writeObject(packagedCommand);
+                String serializeCommand = Base64.getEncoder().encodeToString(stringOut.toByteArray());
+                SocketChannel socketChannel = (SocketChannel) key.channel();
+                ByteBuffer byteBuffer = ByteBuffer.wrap(serializeCommand.getBytes());
+                try {
+                    socketChannel.write(byteBuffer);
+                } catch (Exception e) {
+                    System.out.println(e + " 114");
+                }
+                timeOut = currentTimeMillis();
             }
-            else if(msg.equalsIgnoreCase("show")){
-                PackagedCommand packagedCommand = new PackagedCommand(msg,null, null);
-                ByteArrayOutputStream str = new ByteArrayOutputStream();
-                ObjectOutputStream obj = new ObjectOutputStream(str);
-                obj.writeObject(packagedCommand);
-                String serCommand1 = Base64.getEncoder().encodeToString(str.toByteArray());
-                SocketChannel sc = (SocketChannel) key.channel();
-                ByteBuffer bb = ByteBuffer.wrap(serCommand1.getBytes());
-                System.out.println(serCommand1);
-                sc.write(bb);
-                return false;
-            }
-            SocketChannel sc = (SocketChannel) key.channel();
-            ByteBuffer bb = ByteBuffer.wrap(msg.getBytes());
-            sc.write(bb);
             return false;
-            } catch (NoSuchElementException e) {
-                System.exit(0);
-            }
         }
         return false;
     }
@@ -109,6 +127,8 @@ public class ClientApp {
         } catch (IOException e) {
             key.cancel();
             e.printStackTrace();
+            serverWork = false;
+            System.out.println(e + " 130");
             return false;
         }
         return true;

@@ -8,10 +8,11 @@ import java.util.List;
 
 public class Invoker {
 
-    HashMap<String, Command> commands = new HashMap<>();
+    public HashMap<String, Command> commands = new HashMap<>();
     public Invoker (List collection) {
         commands.put("help", new HelpCommand());
         //commands.put("finish_server", new ServerExitCommand());
+        commands.put("exit", new HelpCommand());
         commands.put("add", new AddCommand(collection));
         commands.put("info", new InfoCommand(collection));
         commands.put("show", new ShowCommand(collection));
@@ -21,7 +22,7 @@ public class Invoker {
         //commands.put("save", new SaveCommand(collection));
         commands.put("load", new LoadCommand(collection));
         commands.put("remove_by_id", new RemoveByIdCommand(collection));
-        commands.put("update_id", new UpdateIdCommand(collection));
+        commands.put("update", new UpdateIdCommand(collection));
         commands.put("print_descending", new PrintDescendingCommand(collection));
         commands.put("print_unique_standard_of_living", new PrintUniqueStandardOfLivingCommand(collection));
         commands.put("print_field_ascending_standard_of_living", new PrintFieldAscendingStandardOfLivingCommand(collection));
