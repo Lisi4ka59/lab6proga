@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ExecuteScriptValid {
-    static ArrayList<String> exeRecursion = new ArrayList<>();
-    static ArrayList<PackagedCommand> commandsToRun = new ArrayList<>();
+    ArrayList<String> exeRecursion = new ArrayList<>();
     public PackagedCommand[] executeScriptValid(String[] commandText) throws IllegalArgumentException {
+        ArrayList<PackagedCommand> commandsToRun = new ArrayList<>();
         if (commandText.length == 2) {
             String fileName = commandText[1];
             System.out.printf("Start of executing script from file \"%s\"\n", fileName);
@@ -31,12 +31,15 @@ public class ExecuteScriptValid {
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    lines.add(line);
+                    line = line.trim();
+                    if (!"".equals(line)){
+                        lines.add(line);
+                    }
                 }
             } catch (SecurityException e) {
                 System.out.printf("Do not have sufficient rights to execute file %s\n", fileName);
             } catch (IOException e) {
-                System.out.printf("File %s does not exist\n", fileName);
+                System.out.printf("File \"%s\" does not exist\n", fileName);
             }
 
             for (int i = 0; i < lines.size(); i++) {
@@ -57,6 +60,7 @@ public class ExecuteScriptValid {
                                             lineArgs.append(",");
                                         }
                                     }
+                                    i--;
                                     commandsToRun.add(new PackagedCommand(line[0], lineArgs.toString()));
                                 } catch (Exception ex) {
                                     System.out.printf("Illegal arguments for command %s!\n", line[0]);

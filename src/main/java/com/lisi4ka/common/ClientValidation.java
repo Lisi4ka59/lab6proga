@@ -53,8 +53,7 @@ public class ClientValidation {
         }
     }
     private static PackagedCommand addValid(String[] commandText){
-        inputName();
-        return new PackagedCommand(commandText[0], null);
+        return new PackagedCommand(commandText[0], commandText[1]);
     }
     private static PackagedCommand showValid(String[] commandText){
             if (commandText.length == 1){

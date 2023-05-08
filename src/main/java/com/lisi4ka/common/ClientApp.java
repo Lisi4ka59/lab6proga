@@ -19,9 +19,9 @@ import static java.lang.Thread.sleep;
 public class ClientApp {
     static long timeOut = currentTimeMillis();
     static boolean serverWork = true;
+    static Queue<ByteBuffer> queue = new LinkedList<>();
     public static void main(String[] args) throws Exception {
         while (true) {
-            System.out.println("samuy pervuy while");
             boolean doneStatus = true;
             serverWork = true;
             InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName("localhost"), 1234);
@@ -39,7 +39,6 @@ public class ClientApp {
                     }
                     catch (ConnectException ex){
                         System.out.println("Lost server connection. Repeat connecting in 10 seconds");
-
                         break;
                     }
                     if (doneStatus || !serverWork) {
@@ -51,6 +50,7 @@ public class ClientApp {
                 break;
             }
             sc.close();
+            System.out.println("Lost server connection. Repeat connecting in 10 seconds");
             sleep(10000);
             timeOut = currentTimeMillis();
         }
@@ -60,19 +60,18 @@ public class ClientApp {
             throws Exception {
 
         SelectionKey key = null;
-        Iterator iterator = null;
-        iterator = readySet.iterator();
+        Iterator iterator = readySet.iterator();
         while (iterator.hasNext()) {
             key = (SelectionKey) iterator.next();
             iterator.remove();
         }
         assert key != null;
         if (key.isConnectable()) {
-            Boolean connected = false;
+            boolean connected = false;
             try{
                 connected = processConnect(key);
             }catch (Exception e){
-                System.out.println("Lost server connection. Repeat connecting in 15 seconds");
+                System.out.println("Lost server connection");
             }
 
             if (!connected) {
@@ -85,34 +84,33 @@ public class ClientApp {
             try{
                 sc.read(bb);
             }catch (Exception e){
-                System.out.println("sc read oshibka" + e);
                 serverWork = false;
                 return false;
             }
-
-            String result = new String(bb.array()).trim();
-            System.out.println("Message received from Server: " + result + " Message length= "
-                    + result.length());
+            System.out.println(new String(bb.array()).trim());
         }
         if (key.isWritable() && timeOut < (currentTimeMillis()-500)) {
-            for (PackagedCommand packagedCommand:  ClientValidation.validation()) {
-
-
-                if ("exit".equalsIgnoreCase(packagedCommand.getCommandName())) {
-                    return true;
+            SocketChannel socketChannel = (SocketChannel) key.channel();
+            if (queue.isEmpty()) {
+                for (PackagedCommand packagedCommand : ClientValidation.validation()) {
+                    if ("exit".equalsIgnoreCase(packagedCommand.getCommandName())) {
+                        return true;
+                    }
+                    ByteArrayOutputStream stringOut = new ByteArrayOutputStream();
+                    ObjectOutputStream serializeObject = new ObjectOutputStream(stringOut);
+                    serializeObject.writeObject(packagedCommand);
+                    String serializeCommand = Base64.getEncoder().encodeToString(stringOut.toByteArray());
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(serializeCommand.getBytes());
+                    queue.add(byteBuffer);
                 }
-                ByteArrayOutputStream stringOut = new ByteArrayOutputStream();
-                ObjectOutputStream serializeObject = new ObjectOutputStream(stringOut);
-                serializeObject.writeObject(packagedCommand);
-                String serializeCommand = Base64.getEncoder().encodeToString(stringOut.toByteArray());
-                SocketChannel socketChannel = (SocketChannel) key.channel();
-                ByteBuffer byteBuffer = ByteBuffer.wrap(serializeCommand.getBytes());
+            }
+            if (!queue.isEmpty()) {
                 try {
-                    socketChannel.write(byteBuffer);
+                    socketChannel.write(queue.poll());
+                    timeOut = currentTimeMillis();
                 } catch (Exception e) {
-                    System.out.println(e + " 114");
+                    System.out.println("Error while sending message!");
                 }
-                timeOut = currentTimeMillis();
             }
             return false;
         }
@@ -126,9 +124,7 @@ public class ClientApp {
             }
         } catch (IOException e) {
             key.cancel();
-            e.printStackTrace();
             serverWork = false;
-            System.out.println(e + " 130");
             return false;
         }
         return true;
