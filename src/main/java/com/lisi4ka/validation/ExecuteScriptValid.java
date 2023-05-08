@@ -13,8 +13,8 @@ public class ExecuteScriptValid {
     static ArrayList<String> exeRecursion = new ArrayList<>();
     static ArrayList<PackagedCommand> commandsToRun = new ArrayList<>();
     public PackagedCommand[] executeScriptValid(String[] commandText) throws IllegalArgumentException {
-        String fileName = commandText[1];
         if (commandText.length == 2) {
+            String fileName = commandText[1];
             System.out.printf("Start of executing script from file \"%s\"\n", fileName);
             if (exeRecursion.contains(fileName)) {
                 System.out.printf("Can not execute script from file %s, because it can be very dangerous as it can cause recursion!\n", fileName);
@@ -40,31 +40,36 @@ public class ExecuteScriptValid {
             }
 
             for (int i = 0; i < lines.size(); i++) {
-                String[] line = lines.get(i).split(" ");
-                if ("execute_script".equals(line[0])) {
-                    commandsToRun.addAll(Arrays.stream(executeScriptValid(line)).toList());
-                } else {
-                    if (line.length == 1) {
-                        if ("add".equals(line[0]) || "update_id".equals(line[0])) {
-                            try {
-                                int j = i + 12;
-                                i++;
-                                int g = 1;
-                                StringBuilder lineArgs = null;
-                                for (; i < j; i++) {
-                                    lineArgs.append(line[g]);
-                                    g++;
+                try {
+                    String[] line = lines.get(i).split(" ");
+                    if ("execute_script".equals(line[0])) {
+                        commandsToRun.addAll(Arrays.stream(executeScriptValid(line)).toList());
+                    } else {
+                        if (line.length == 1) {
+                            if ("add".equals(line[0]) || "update_id".equals(line[0])) {
+                                try {
+                                    int j = i + 12;
+                                    i++;
+                                    StringBuilder lineArgs = new StringBuilder();
+                                    for (; i < j; i++) {
+                                        lineArgs.append(lines.get(i));
+                                        if (i != j-1){
+                                            lineArgs.append(",");
+                                        }
+                                    }
+                                    commandsToRun.add(new PackagedCommand(line[0], lineArgs.toString()));
+                                } catch (Exception ex) {
+                                    System.out.printf("Illegal arguments for command %s!\n", line[0]);
                                 }
-                            } catch (Exception ex) {
-                                System.out.printf("Illegal arguments for command %s!\n", line[0]);
+                            } else {
+                                commandsToRun.add(new PackagedCommand(line[0], null));
                             }
                         } else {
-                            i++;
-                            commandsToRun.add(new PackagedCommand(line[0], null));
+                            commandsToRun.add(new PackagedCommand(line[0], line[1]));
                         }
-                    } else
-                        i++;
-                    commandsToRun.add(new PackagedCommand(line[0], line[1]));
+                    }
+                }catch(IllegalArgumentException ex){
+                    System.out.printf("Illegal arguments for command %s!\n", commandText[0]);
                 }
             }
             exeRecursion.remove(fileName);
@@ -72,6 +77,6 @@ public class ExecuteScriptValid {
             return commandsToRun.toArray(PackagedCommand[]::new);
         }
         else
-            throw new IllegalArgumentException("Invalid arguments for command execute_script! ");
+            throw new IllegalArgumentException("Invalid arguments for command execute_script!\n");
     }
 }

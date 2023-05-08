@@ -44,8 +44,9 @@ public class ClientValidation {
                     }catch (IllegalArgumentException ex){
                         System.out.printf(ex.getMessage());
                     }
-            }
-                System.out.println("Enter \"help\" to open command list");
+            }else {
+                    System.out.println("Unknown command! Type \"help\" to open command list");
+                }
             } catch (NoSuchElementException e) {
                 System.exit(0);
             }
@@ -60,7 +61,7 @@ public class ClientValidation {
                 return new PackagedCommand(commandText[0], null);
             }
             else {
-                throw new IllegalArgumentException("Command \"show\" takes no arguments! ");
+                throw new IllegalArgumentException("Command \"show\" takes no arguments!\n");
             }
     }
 }
