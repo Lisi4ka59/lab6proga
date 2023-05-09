@@ -70,6 +70,7 @@ public class ClientApp {
             boolean connected = false;
             try{
                 connected = processConnect(key);
+                System.out.println("Connection Accepted");
             }catch (Exception e){
                 System.out.println("Lost server connection");
             }
@@ -80,7 +81,7 @@ public class ClientApp {
         }
         if (key.isReadable()) {
             SocketChannel sc = (SocketChannel) key.channel();
-            ByteBuffer bb = ByteBuffer.allocate(1000000);
+            ByteBuffer bb = ByteBuffer.allocate(8192);
             try{
                 sc.read(bb);
             }catch (Exception e){
@@ -89,11 +90,11 @@ public class ClientApp {
             }
             System.out.println(new String(bb.array()).trim());
         }
-        if (key.isWritable() && timeOut < (currentTimeMillis()-500)) {
+        if (key.isWritable() && timeOut < (currentTimeMillis()-300)) {
             SocketChannel socketChannel = (SocketChannel) key.channel();
             if (queue.isEmpty()) {
                 for (PackagedCommand packagedCommand : ClientValidation.validation()) {
-                    if ("exit".equalsIgnoreCase(packagedCommand.getCommandName())) {
+                    if ("exit".equals(packagedCommand.getCommandName())){
                         return true;
                     }
                     ByteArrayOutputStream stringOut = new ByteArrayOutputStream();

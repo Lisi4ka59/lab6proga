@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Scanner;
 
-//import static com.sun.org.apache.xerces.internal.util.XMLChar.trim;
-
 
 public class Checker {
 
@@ -33,6 +31,9 @@ public class Checker {
         String message = "The entered value is not long, enter correct value\nRepeat input: ";
         do {
             testString = (scanner.nextLine()).trim();
+            if ("".equals(testString)){
+                throw new IllegalArgumentException();
+            }
             try {
                 value = Long.parseLong(testString);
                 return value;
@@ -81,6 +82,9 @@ public class Checker {
         System.out.print(prompt);
         do {
             date = (scanner.nextLine()).trim();
+            if ("".equals(date)){
+                return null;
+            }
             dateTest = date.replace(".", "");
             String[] dateArray = date.split("\\.");
             boolean isNumeric;
@@ -109,12 +113,16 @@ public class Checker {
         Date = (Date).trim();
         Date = Date.replace(" ", ".");
         String[] DateArray = Date.split("\\.");
-        try {
-            int day = Integer.parseInt(DateArray[0]);
-            int month = Integer.parseInt(DateArray[1]) - 1;
-            int year = Integer.parseInt(DateArray[2]) - 1900;
-            return new Date(year, month, day);
-        } catch (NumberFormatException e) {
+        if (DateArray.length == 3 && Integer.parseInt(DateArray[2]) > 0 && Integer.parseInt(DateArray[1]) > 0 && Integer.parseInt(DateArray[1]) < 13 && Integer.parseInt(DateArray[0]) < 32 && Integer.parseInt(DateArray[0]) > 0) {
+            try {
+                int day = Integer.parseInt(DateArray[0]);
+                int month = Integer.parseInt(DateArray[1]) - 1;
+                int year = Integer.parseInt(DateArray[2]) - 1900;
+                return new Date(year, month, day);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException();
+            }
+        }else {
             throw new IllegalArgumentException();
         }
     }

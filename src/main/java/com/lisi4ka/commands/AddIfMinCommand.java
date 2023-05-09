@@ -29,7 +29,7 @@ public class AddIfMinCommand implements Command{
         if (addIfMin(city)) {
             idRepeat+=1;
             collection.sort(new CityComparator());
-            return "City was successfully added to collection" + defaultSave(collection);
+            return "City was successfully added to collection\n" + defaultSave(collection);
         }
         else {
             return "City is not added to collection";

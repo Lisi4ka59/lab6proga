@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 
-import static com.lisi4ka.common.AppClient.cities;
+import static com.lisi4ka.common.ServerApp.cities;
+
 
 public class CityLinkedList extends LinkedList<City> implements Jsonable {
     public static Long idRepeat = 0L;

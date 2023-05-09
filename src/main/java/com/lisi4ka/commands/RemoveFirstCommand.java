@@ -14,7 +14,7 @@ public class RemoveFirstCommand implements Command{
     public String execute() {
         if (!collection.isEmpty()) {
             collection.remove(0);
-            return "First element of collection removed" + defaultSave(collection);
+            return "First element of collection removed\n" + defaultSave(collection);
         }
         else {
             return "Collection is empty";

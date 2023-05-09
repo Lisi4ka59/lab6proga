@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import static com.lisi4ka.common.AppClient.cities;
+import static com.lisi4ka.common.ServerApp.cities;
 import static com.lisi4ka.utils.Checker.checkLocalDateTime;
 import static com.lisi4ka.utils.CityLinkedList.idRepeat;
 
@@ -78,10 +78,11 @@ public class City implements Jsonable, Comparable<City> {
         else
             setGovernment(Government.valueOf(jsonObject.getString(governmentKey)));
         this.climate =Climate.valueOf(jsonObject.getString(climateKey));
-        JsonObject joGovernor  = (JsonObject)jsonObject.get ("governor");
-        if (joGovernor.getString(ageKey)==null || joGovernor.getString(birthdayKey)==null)
+        JsonObject joGovernor = (JsonObject) jsonObject.get("governor");
+        if (joGovernor == null){
             setGovernor(null);
-        else {
+        }
+        else{
             String birthdayString=joGovernor.getString(birthdayKey);
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             Date birthday;
@@ -90,7 +91,7 @@ public class City implements Jsonable, Comparable<City> {
             } catch (ParseException i) {
                 birthday = null;
             }
-            setJsonGovernor(joGovernor.getLong(ageKey), birthday);
+            setGovernor(new Human(joGovernor.getLong(ageKey), birthday));
         }
     }
 

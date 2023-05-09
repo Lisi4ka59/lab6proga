@@ -25,7 +25,12 @@ public class CityReader {
 
     public static long inputPopulation() {
         do {
-            long population = inputLong("Enter city population (population must be more than 0): ");
+            long population;
+            try {
+                population = inputLong("Enter city population (population must be more than 0): ");
+            }catch (IllegalArgumentException ex){
+                population = 0;
+            }
             if (population > 0){
                 return population;
             }
@@ -96,13 +101,20 @@ public class CityReader {
         long age;
         System.out.println("City governor");
         do {
-            age = inputLong("Enter governor age: ");
+            try {
+                age = inputLong("Enter governor age: ");
+            }catch (IllegalArgumentException ex){
+                return null;
+            }
             if (age > 0 ){
                 break;
             }
             System.out.println("Governor age must be long and more than 0!");
         }while (true);
         Date governorBirthday = inputDate("Governor birthday\nEnter date (dd.MM.yyyy): ");
+        if (governorBirthday == null){
+            return null;
+        }
         return new Human(age, governorBirthday);
     }
 }

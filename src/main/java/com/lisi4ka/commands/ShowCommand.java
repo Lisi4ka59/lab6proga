@@ -17,7 +17,7 @@ public class ShowCommand implements Command{
         else {
             StringBuilder stringShow = new StringBuilder();
             for (City city : collection) {
-                 stringShow.append(String.format("\n" + city.toString()));
+                 stringShow.append(String.format("\n" + city.toString() + "\n"));
             }
             return stringShow.toString();
         }
