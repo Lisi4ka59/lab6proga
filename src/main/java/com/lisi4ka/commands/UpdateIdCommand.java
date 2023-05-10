@@ -53,7 +53,7 @@ public class UpdateIdCommand implements Command{
             }
         }
         if (update)
-            return String.format("City %d updated\n", id);
+            return String.format("City %d updated\n%s", id, defaultSave(collection));
         else
             return String.format("City %d doesn't exist\n", id);
     }
@@ -62,6 +62,6 @@ public class UpdateIdCommand implements Command{
         String[] cityArgs = args.split(",");
         String answer = updateArgs(cityArgs);
         collection.sort(new CityComparator());
-        return answer + defaultSave(collection);
+        return answer;
     }
 }
